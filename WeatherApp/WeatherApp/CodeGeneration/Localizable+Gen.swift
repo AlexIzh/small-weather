@@ -18,7 +18,7 @@ internal enum L10n {
       return L10n.tr("Localizable", "details.time", p1)
     }
     internal enum Cloud {
-      /// Cloudiness - %@%
+      /// Cloudiness - %@%%
       internal static func description(_ p1: String) -> String {
         return L10n.tr("Localizable", "details.cloud.description", p1)
       }

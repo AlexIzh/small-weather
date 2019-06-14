@@ -10,7 +10,7 @@
 "details.wind.description" = "Speed - %1$@ m/s, Direction - %2$@°";
 
 "details.cloud.title" = "Cloud";
-"details.cloud.description" = "Cloudiness - %@%";
+"details.cloud.description" = "Cloudiness - %@%%";
 
 "details.temp.title" = "Temperature";
 "details.temp.description" = "Temperature - %1$@ K\nMin - %2$@ K, Max - %3$@ K";
