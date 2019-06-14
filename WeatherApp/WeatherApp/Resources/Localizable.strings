@@ -1,0 +1,30 @@
+/* 
+  Localizable.strings
+  WeatherApp
+
+  Created by Alex Severyanov on 6/14/19.
+  Copyright © 2019 Alex Severyanov. All rights reserved.
+*/
+
+"details.wind.title" = "Wind";
+"details.wind.description" = "Speed - %1$@ m/s, Direction - %2$@°";
+
+"details.cloud.title" = "Cloud";
+"details.cloud.description" = "Cloudiness - %@%";
+
+"details.temp.title" = "Temperature";
+"details.temp.description" = "Temperature - %1$@ K\nMin - %2$@ K, Max - %3$@ K";
+
+"details.sunset.title" = "Sunrise/Sunset";
+"details.sunset.description" = "Sunrise - %1$@, Sunset  - %2$@";
+
+"details.time" = "Time of data calculation - %@";
+
+"list.my_location.permission" = "Location Services are not allowed!";
+"list.my_location.try_again" = "Try again to load weather for my location";
+"list.my_location.title" = "My location: %@";
+
+"list.cities.try_again" = "Try again to load weather for cities";
+
+"general.error" = "Error";
+"general.button.ok" = "OK";
