@@ -1,5 +1,5 @@
 //
-//  DataLoaderTests.swift
+//  DataProviderTests.swift
 //  WeatherAppTests
 //
 //  Created by Alex Severyanov on 6/13/19.
@@ -9,8 +9,8 @@
 import XCTest
 @testable import WeatherApp
 
-class DataLoaderTests: XCTestCase {
-   func testRunRequest_success() {
+class DataProviderTests: XCTestCase {
+   func testStartRequest_success() {
       let session = TestSession()
       session.stubbedTaskCompletionParams = .success(Data())
 
@@ -23,10 +23,10 @@ class DataLoaderTests: XCTestCase {
 
       Assert.isTrue(isCompletionCalled)
       Assert.isTrue(task.isResumed)
-      Assert.equals(session.invokedTaskParam, makeAPI().makeRequest())
+      Assert.isTrue(session.invokedTaskParam is APITests.TestAPI)
    }
 
-   func testRunRequest_error() {
+   func testStartRequest_error() {
       let session = TestSession()
       session.stubbedTaskCompletionParams = .failure(NSError(domain: "", code: 1, userInfo: nil))
 
@@ -66,14 +66,14 @@ class DataLoaderTests: XCTestCase {
    }
 }
 
-extension DataLoaderTests {
+extension DataProviderTests {
    class TestSession: Session {
-      var invokedTaskParam: URLRequest?
+      var invokedTaskParam: API?
       var stubbedTaskCompletionParams: Result<Data, Error>?
       var stubbedTaskResult = TestTask()
 
-      func task(with request: URLRequest, completion: @escaping (Result<Data, Error>) -> Void) -> URLTask {
-         invokedTaskParam = request
+      func task(for api: API, completion: @escaping (Result<Data, Error>) -> Void) -> URLTask? {
+         invokedTaskParam = api
          if let params = stubbedTaskCompletionParams {
             completion(params)
          }
