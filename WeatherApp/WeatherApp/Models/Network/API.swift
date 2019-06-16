@@ -17,6 +17,8 @@ protocol API {
    var path: String { get }
    var method: HTTPMethod { get }
    var parameters: [String: String?]? { get }
+
+   func error(from data: Data, response: URLResponse) -> Error?
 }
 
 extension API {
@@ -32,4 +34,18 @@ extension API {
       request?.httpMethod = method.rawValue
       return request
    }
+
+   func error(from data: Data, response: URLResponse) -> Error? {
+      guard let response = response as? HTTPURLResponse else { return nil }
+
+      if response.statusCode >= 400 {
+         return APIError(code: response.statusCode, errorDescription: HTTPURLResponse.localizedString(forStatusCode: response.statusCode))
+      }
+      return nil
+   }
+}
+
+struct APIError: Error, LocalizedError {
+   let code: Int
+   let errorDescription: String?
 }

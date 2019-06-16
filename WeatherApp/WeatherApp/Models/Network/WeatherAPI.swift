@@ -52,4 +52,19 @@ enum WeatherAPI: API {
    var method: HTTPMethod {
       return .get
    }
+
+   func error(from data: Data, response: URLResponse) -> Error? {
+      guard let response = response as? HTTPURLResponse else { return nil }
+
+      if response.statusCode >= 400 {
+         let errorMessage = try? JSONDecoder().decode(ErrorMessage.self, from: data)
+         let message = errorMessage?.message.flatMap { $0.isEmpty ? nil : $0 } ?? HTTPURLResponse.localizedString(forStatusCode: response.statusCode)
+         return APIError(code: response.statusCode, errorDescription: message)
+      }
+      return nil
+   }
+
+   struct ErrorMessage: Decodable {
+      let message: String?
+   }
 }

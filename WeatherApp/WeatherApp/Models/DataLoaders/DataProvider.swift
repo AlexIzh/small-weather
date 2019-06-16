@@ -27,11 +27,9 @@ class DataProvider {
 extension DataProvider {
    @discardableResult
    func startRequest(for api: API, completion: @escaping (Result<Data, Error>) -> Void) -> URLTask? {
-      guard let request = api.makeRequest() else { return nil }
-
-      let task = session.task(with: request, completion: completion)
-      task.resume()
-      tasks.append(WeakURLTask(task))
+      let task = session.task(for: api, completion: completion)
+      task?.resume()
+      task.map { tasks.append(WeakURLTask($0)) }
       return task
    }
 

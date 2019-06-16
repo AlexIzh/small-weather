@@ -9,7 +9,7 @@
 import Foundation
 
 protocol Session {
-   func task(with request: URLRequest, completion: @escaping (Result<Data, Error>) -> Void) -> URLTask
+   func task(for api: API, completion: @escaping (Result<Data, Error>) -> Void) -> URLTask?
 }
 
 protocol URLTask: class {
@@ -21,13 +21,21 @@ extension URLSessionTask: URLTask {}
 
 extension URLSession: Session {
    
-   func task(with request: URLRequest, completion: @escaping (Result<Data, Error>) -> Void) -> URLTask {
-      /// We do not handle custom messages/responses for server errors because for this project only a success result makes value for us.
-      return dataTask(with: request) { data, _, error in
+   func task(for api: API, completion: @escaping (Result<Data, Error>) -> Void) -> URLTask? {
+      guard let request = api.makeRequest() else {
+         assertionFailure("\(api) can't make a request.")
+         return nil
+      }
+
+      return dataTask(with: request) { data, response, error in
          if let error = error {
             completion(.failure(error))
          } else if let data = data {
-            completion(.success(data))
+            if let response = response, let error = api.error(from: data, response: response) {
+               completion(.failure(error))
+            } else {
+               completion(.success(data))
+            }
          }
       }
    }
