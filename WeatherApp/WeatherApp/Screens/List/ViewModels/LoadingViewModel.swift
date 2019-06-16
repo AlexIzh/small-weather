@@ -19,15 +19,10 @@ class LoadingViewModel: ViewActionPerformer {
       case failed
    }
 
-   let viewQueue: DispatchQueue?
    var viewActionHandler: (ViewAction) -> Void = {_ in}
    var state: State = .loading {
       didSet {
          send(.updateState(state))
       }
-   }
-
-   init(viewQueue: DispatchQueue? = .main) {
-      self.viewQueue = viewQueue
    }
 }

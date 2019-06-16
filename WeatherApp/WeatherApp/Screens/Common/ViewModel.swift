@@ -12,26 +12,12 @@ protocol ViewActionPerformer: class {
    associatedtype ViewAction
 
    var viewActionHandler: (ViewAction) -> Void { get set }
-   var viewQueue: DispatchQueue? { get }
-
-   func send(_ action: ViewAction, async: Bool)
+   func send(_ action: ViewAction)
 }
 
 extension ViewActionPerformer {
-   func send(_ action: ViewAction, async: Bool = true) {
-      if let queue = viewQueue, async {
-         queue.async { [weak self] in self?.viewActionHandler(action) }
-      } else {
-         viewActionHandler(action)
-      }
-   }
-
-   func executeViewActions(_ closure: @escaping (Self) -> Void) {
-      if let queue = viewQueue {
-         queue.async { [weak self] in self.map { closure($0) } }
-      } else {
-         closure(self)
-      }
+   func send(_ action: ViewAction) {
+      viewActionHandler(action)
    }
 }
 

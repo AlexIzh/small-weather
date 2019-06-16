@@ -11,13 +11,13 @@ import CoreLocation
 
 final class WeatherDataProvider: DataProvider {
 
-   override init(session: Session = URLSession.shared) {
-      super.init(session: session)
+   override init(session: Session = URLSession.shared, responseQueue: DispatchQueue? = .main) {
+      super.init(session: session, responseQueue: responseQueue)
    }
 
    func weather(coordinates: CLLocationCoordinate2D, completion: @escaping (Result<Weather, Error>) -> Void) {
-      runRequest(with: WeatherAPI.weatherByCoordinates(coordinates)) {
-         completion($0.flatMap {
+      startRequest(for: WeatherAPI.weatherByCoordinates(coordinates)) { [responseQueue] in
+         let result: Result<Weather, Error> = $0.flatMap {
             do {
                let decoder = JSONDecoder()
                decoder.dateDecodingStrategy = .secondsSince1970
@@ -25,15 +25,16 @@ final class WeatherDataProvider: DataProvider {
             } catch {
                return .failure(error)
             }
-         })
+         }
+         execute(on: responseQueue) { completion(result) }
       }
    }
 
    func weatherForCities(completion: @escaping (Result<[Weather], Error>) -> Void) {
       /// ids could be moved to parameters if we need to possibility to add/remove cities from a list
       let ids = ["2643741", "1850147"]
-      runRequest(with: WeatherAPI.weatherByIDs(ids)) {
-         completion($0.flatMap {
+      startRequest(for: WeatherAPI.weatherByIDs(ids)) { [responseQueue] in
+         let result: Result<[Weather], Error> = $0.flatMap {
             do {
                let decoder = JSONDecoder()
                decoder.dateDecodingStrategy = .secondsSince1970
@@ -42,7 +43,8 @@ final class WeatherDataProvider: DataProvider {
             } catch {
                return .failure(error)
             }
-         })
+         }
+         execute(on: responseQueue) { completion(result) }
       }
    }
 }

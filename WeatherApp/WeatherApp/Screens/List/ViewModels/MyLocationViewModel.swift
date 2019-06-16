@@ -35,17 +35,15 @@ class MyLocationViewModel: ViewActionPerformer {
       case success(WeatherViewModel)
    }
 
-   let viewQueue: DispatchQueue?
    var viewActionHandler: (ViewAction) -> Void = {_ in}
    var state: State = .loading
 
    private let locationManager = LocationManager()
-   private let loader: WeatherDataProvider
+   private let provider: WeatherDataProvider
    private let settingsOpener: SettingsOpener
 
-   init(viewQueue: DispatchQueue? = .main, loader: WeatherDataProvider = .init(), settingsOpener: SettingsOpener = UIApplication.shared) {
-      self.viewQueue = viewQueue
-      self.loader = loader
+   init(provider: WeatherDataProvider = .init(), settingsOpener: SettingsOpener = UIApplication.shared) {
+      self.provider = provider
       self.settingsOpener = settingsOpener
 
       locationManager.authorizationChanged = { [unowned self] in
@@ -68,14 +66,12 @@ extension MyLocationViewModel {
       locationManager.requestOnce { [unowned self] in
          switch $0 {
          case .failure:
-            self.executeViewActions {
-               if self.locationManager.authorizationStatus != .authorizedWhenInUse {
-                  self.state = .noPermissions
-               } else {
-                  self.state = .retry
-               }
-               $0.send(.updateState($0.state), async: false)
+            if self.locationManager.authorizationStatus != .authorizedWhenInUse {
+               self.state = .noPermissions
+            } else {
+               self.state = .retry
             }
+            self.send(.updateState(self.state))
 
          case .success(let location):
             self.loadWeather(for: location)
@@ -84,19 +80,15 @@ extension MyLocationViewModel {
    }
 
    private func loadWeather(for location: CLLocationCoordinate2D) {
-      loader.weather(coordinates: location) { [weak self] result in
-         self?.executeViewActions {
-            switch result {
-            case .failure:
-               $0.state = .retry
+      provider.weather(coordinates: location) { [weak self] in
+         let state: State = (try? $0.get()).map {
+            let viewModel = MyLocationWeatherViewModel($0)
+            viewModel.imageViewModel.startLoading()
+            return .success(viewModel)
+         } ?? .retry
 
-            case .success(let weather):
-               let viewModel = MyLocationWeatherViewModel(weather)
-               viewModel.imageViewModel.startLoading()
-               $0.state = .success(viewModel)
-            }
-            $0.send(.updateState($0.state), async: false)
-         }
+         self?.state = state
+         self?.send(.updateState(state))
       }
    }
 }

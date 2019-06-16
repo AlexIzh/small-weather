@@ -11,7 +11,7 @@ import XCTest
 
 class LoadingViewModelTests: XCTestCase {
    func testStateChange() {
-      let viewModel = LoadingViewModel(viewQueue: nil)
+      let viewModel = LoadingViewModel()
       var states: [LoadingViewModel.State] = []
       viewModel.viewActionHandler = {
          if case .updateState(let state) = $0 {

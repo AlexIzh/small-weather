@@ -10,11 +10,13 @@ import Foundation
 
 class DataProvider {
    let session: Session
+   let responseQueue: DispatchQueue?
 
    private var tasks: [WeakURLTask] = []
 
-   init(session: Session) {
+   init(session: Session, responseQueue: DispatchQueue?) {
       self.session = session
+      self.responseQueue = responseQueue
    }
 
    deinit {
@@ -24,7 +26,7 @@ class DataProvider {
 
 extension DataProvider {
    @discardableResult
-   func runRequest(with api: API, completion: @escaping (Result<Data, Error>) -> Void) -> URLTask? {
+   func startRequest(for api: API, completion: @escaping (Result<Data, Error>) -> Void) -> URLTask? {
       guard let request = api.makeRequest() else { return nil }
 
       let task = session.task(with: request, completion: completion)
@@ -37,6 +39,10 @@ extension DataProvider {
       tasks.forEach { $0.cancel() }
       tasks.removeAll()
    }
+}
+
+func execute(on queue: DispatchQueue?, closure: @escaping () -> Void) {
+   queue?.async(execute: closure) ?? closure()
 }
 
 private class WeakURLTask {

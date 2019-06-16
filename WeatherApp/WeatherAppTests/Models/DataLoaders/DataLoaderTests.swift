@@ -14,10 +14,10 @@ class DataLoaderTests: XCTestCase {
       let session = TestSession()
       session.stubbedTaskCompletionParams = .success(Data())
 
-      let loader = DataProvider(session: session)
+      let loader = DataProvider(session: session, responseQueue: nil)
       var isCompletionCalled = false
 
-      let task = loader.runRequest(with: makeAPI()) {
+      let task = loader.startRequest(for: makeAPI()) {
          isCompletionCalled = (try? $0.get()) != nil
       } as! TestTask
 
@@ -30,10 +30,10 @@ class DataLoaderTests: XCTestCase {
       let session = TestSession()
       session.stubbedTaskCompletionParams = .failure(NSError(domain: "", code: 1, userInfo: nil))
 
-      let loader = DataProvider(session: session)
+      let loader = DataProvider(session: session, responseQueue: nil)
       var isCompletionCalled = false
 
-      loader.runRequest(with: makeAPI()) {
+      loader.startRequest(for: makeAPI()) {
          isCompletionCalled = (try? $0.get()) == nil
       }
 
@@ -42,8 +42,8 @@ class DataLoaderTests: XCTestCase {
 
    func testCancelAll() {
       let session = TestSession()
-      let loader = DataProvider(session: session)
-      loader.runRequest(with: makeAPI(), completion: {_ in})
+      let loader = DataProvider(session: session, responseQueue: nil)
+      loader.startRequest(for: makeAPI(), completion: {_ in})
 
       loader.cancelAll()
 
@@ -54,8 +54,8 @@ class DataLoaderTests: XCTestCase {
       let session = TestSession()
 
       do {
-         let loader = DataProvider(session: session)
-         loader.runRequest(with: makeAPI(), completion: {_ in})
+         let loader = DataProvider(session: session, responseQueue: nil)
+         loader.startRequest(for: makeAPI(), completion: {_ in})
       }
 
       Assert.isTrue(session.stubbedTaskResult.isCancelled)

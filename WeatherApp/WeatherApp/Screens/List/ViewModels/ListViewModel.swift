@@ -24,21 +24,19 @@ class ListViewModel: ViewActionPerformer, TransitionPerformer {
       case weather(WeatherViewModel)
    }
 
-   let viewQueue: DispatchQueue?
    var viewActionHandler: (ViewAction) -> Void = {_ in}
    var transitionHandler: (Transition) -> Void = {_ in}
    var items: [Item]
 
-   private let loader: WeatherDataProvider
+   private let provider: WeatherDataProvider
    private let loadingViewModel: LoadingViewModel
    private let myLocationViewModel: MyLocationViewModel
 
-   init(viewQueue: DispatchQueue? = .main, loader: WeatherDataProvider = .init()) {
-      self.viewQueue = viewQueue
-      self.loader = loader
+   init(provider: WeatherDataProvider = .init()) {
+      self.provider = provider
 
-      myLocationViewModel = MyLocationViewModel(viewQueue: viewQueue, loader: loader)
-      loadingViewModel = LoadingViewModel(viewQueue: viewQueue)
+      myLocationViewModel = MyLocationViewModel(provider: provider)
+      loadingViewModel = LoadingViewModel()
       items = [.myLocation(myLocationViewModel), .loading(loadingViewModel)]
    }
 }
@@ -47,18 +45,18 @@ extension ListViewModel {
    func startLoading(_ completion: @escaping (Error?) -> Void) {
       myLocationViewModel.startLoading()
       loadingViewModel.state = .loading
-      loader.weatherForCities { [weak self] in
+      provider.weatherForCities { [weak self] in
          switch $0 {
          case .failure(let error):
             self?.loadingViewModel.state = .failed
-            self?.executeViewActions {_ in completion(error)  }
+            completion(error)
 
          case .success(let items):
-            self?.executeViewActions {
-               $0.items = [.myLocation($0.myLocationViewModel)] + items.map { .weather(WeatherViewModel($0)) }
-               $0.send(.reload, async: false)
-               completion(nil)
+            if let self = self  {
+               self.items = [.myLocation(self.myLocationViewModel)] + items.map { .weather(WeatherViewModel($0)) }
+               self.send(.reload)
             }
+            completion(nil)
          }
       }
    }

@@ -20,17 +20,16 @@ class ImageViewModel: ViewActionPerformer {
       case image(UIImage)
    }
 
-   let viewQueue: DispatchQueue?
-   let loader: ImageProvider
    let id: String
 
    var viewActionHandler: (ViewAction) -> Void = {_ in}
    private(set) var state: State = .empty
 
-   init(id: String, viewQueue: DispatchQueue? = .main, loader: ImageProvider = WeatherImageProvider()) {
+   private let provider: ImageProvider
+
+   init(id: String, provider: ImageProvider = WeatherImageProvider()) {
       self.id = id
-      self.viewQueue = viewQueue
-      self.loader = loader
+      self.provider = provider
    }
 }
 
@@ -43,18 +42,14 @@ extension ImageViewModel {
       state = .loading
       send(.updateState(state))
 
-      loader.load(id: id) {
-         switch $0 {
-         case .success(let image):
-            self.state = .image(image)
-         case .failure:
-            self.state = .failed
-         }
-         self.send(.updateState(self.state))
+      provider.load(id: id) { [weak self] in
+         let state: State = (try? $0.get()).map { .image($0) } ?? .failed
+         self?.state = state
+         self?.send(.updateState(state))
       }
    }
 
    func cancelLoading() {
-      loader.cancelAll()
+      provider.cancelAll()
    }
 }

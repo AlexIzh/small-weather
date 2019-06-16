@@ -11,37 +11,37 @@ import XCTest
 
 class ImageViewModelTests: XCTestCase {
 
-   lazy var loader = TestImageLoader()
-   lazy var viewModel = ImageViewModel(id: "a", viewQueue: nil, loader: loader)
+   lazy var provider = TestImageProvider()
+   lazy var viewModel = ImageViewModel(id: "a", provider: provider)
 
    func testStartLoading_invalidID() {
-      let viewModel = ImageViewModel(id: "", viewQueue: nil, loader: loader)
+      let viewModel = ImageViewModel(id: "", provider: provider)
 
       viewModel.startLoading()
 
-      Assert.isNil(loader.invokedLoadID)
+      Assert.isNil(provider.invokedLoadID)
    }
 
    func testStartLoading_invalidState_loading() {
       viewModel.startLoading()
-      loader.invokedLoadID = nil
+      provider.invokedLoadID = nil
 
       if case .loading = viewModel.state {
          viewModel.startLoading()
-         Assert.isNil(loader.invokedLoadID)
+         Assert.isNil(provider.invokedLoadID)
       } else {
          Assert.fail(String(describing: viewModel.state))
       }
    }
 
    func testStartLoading_invalidState_image() {
-      loader.stubbedResult = .success(UIImage(named: "10d", in: Bundle(for: type(of: self)), compatibleWith: nil)!)
+      provider.stubbedResult = .success(UIImage(named: "10d", in: Bundle(for: type(of: self)), compatibleWith: nil)!)
       viewModel.startLoading()
-      loader.invokedLoadID = nil
+      provider.invokedLoadID = nil
 
       if case .image = viewModel.state {
          viewModel.startLoading()
-         Assert.isNil(loader.invokedLoadID)
+         Assert.isNil(provider.invokedLoadID)
       } else {
          Assert.fail(String(describing: viewModel.state))
       }
@@ -64,7 +64,7 @@ class ImageViewModelTests: XCTestCase {
    }
 
    func testStartLoading_failed() {
-      loader.stubbedResult = .failure(NSError(domain: "", code: 1, userInfo: nil))
+      provider.stubbedResult = .failure(NSError(domain: "", code: 1, userInfo: nil))
       var isCalled = false
       viewModel.viewActionHandler = {
          if case .updateState(let state) = $0, case .failed = state {
@@ -81,7 +81,7 @@ class ImageViewModelTests: XCTestCase {
    }
 
    func testStartLoading_success() {
-      loader.stubbedResult = .success(UIImage(named: "10d", in: Bundle(for: type(of: self)), compatibleWith: nil)!)
+      provider.stubbedResult = .success(UIImage(named: "10d", in: Bundle(for: type(of: self)), compatibleWith: nil)!)
       var isCalled = false
       viewModel.viewActionHandler = {
          if case .updateState(let state) = $0, case .image = state {
@@ -99,10 +99,10 @@ class ImageViewModelTests: XCTestCase {
 
    func testCancelLoading() {
       viewModel.cancelLoading()
-      Assert.isTrue(loader.isCancelled)
+      Assert.isTrue(provider.isCancelled)
    }
 
-   class TestImageLoader: ImageLoader {
+   class TestImageProvider: ImageProvider {
       var invokedLoadID: String?
       var stubbedResult: Result<UIImage, Error>?
       func load(id: String, completion: @escaping (Result<UIImage, Error>) -> Void) {

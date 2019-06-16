@@ -15,7 +15,7 @@ class WeatherImageLoaderTests: XCTestCase {
       let data = try Data(contentsOf: url)
       let session = DataLoaderTests.TestSession()
       session.stubbedTaskCompletionParams = .success(data)
-      let loader = ImageProvider(session: session)
+      let loader = WeatherImageProvider(session: session, responseQueue: nil)
       var isLoadedImage = false
 
       loader.load(id: "1") {
@@ -28,13 +28,13 @@ class WeatherImageLoaderTests: XCTestCase {
    func testLoad_invalidData() {
       let session = DataLoaderTests.TestSession()
       session.stubbedTaskCompletionParams = .success(Data())
-      let loader = ImageProvider(session: session)
+      let loader = WeatherImageProvider(session: session, responseQueue: nil)
       var isCompletionCalled = false
 
 
       loader.load(id: "1") {
          isCompletionCalled = true
-         if case .failure(let error as ImageProvider.Error) = $0, error == .invalidData {
+         if case .failure(let error as WeatherImageProvider.Error) = $0, error == .invalidData {
          } else {
             Assert.fail(String(describing: $0))
          }

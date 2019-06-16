@@ -19,15 +19,16 @@ final class WeatherImageProvider: DataProvider, ImageProvider {
       case invalidData
    }
 
-   override init(session: Session = URLSession.imagesSession) {
-      super.init(session: session)
+   override init(session: Session = URLSession.imagesSession, responseQueue: DispatchQueue? = .main) {
+      super.init(session: session, responseQueue: responseQueue)
    }
 
    func load(id: String, completion: @escaping (Result<UIImage, Swift.Error>) -> Void) {
-      runRequest(with: WeatherAPI.image(id)) {
-         completion($0.flatMap {
+      startRequest(for: WeatherAPI.image(id)) { [responseQueue] in
+         let result = $0.flatMap {
             UIImage(data: $0).map { .success($0) } ?? .failure(Error.invalidData)
-         })
+         }
+         execute(on: responseQueue) { completion(result) }
       }
    }
 }
