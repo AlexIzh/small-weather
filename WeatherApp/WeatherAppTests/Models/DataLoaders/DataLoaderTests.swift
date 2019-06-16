@@ -14,7 +14,7 @@ class DataLoaderTests: XCTestCase {
       let session = TestSession()
       session.stubbedTaskCompletionParams = .success(Data())
 
-      let loader = DataLoader(session: session)
+      let loader = DataProvider(session: session)
       var isCompletionCalled = false
 
       let task = loader.runRequest(with: makeAPI()) {
@@ -30,7 +30,7 @@ class DataLoaderTests: XCTestCase {
       let session = TestSession()
       session.stubbedTaskCompletionParams = .failure(NSError(domain: "", code: 1, userInfo: nil))
 
-      let loader = DataLoader(session: session)
+      let loader = DataProvider(session: session)
       var isCompletionCalled = false
 
       loader.runRequest(with: makeAPI()) {
@@ -42,7 +42,7 @@ class DataLoaderTests: XCTestCase {
 
    func testCancelAll() {
       let session = TestSession()
-      let loader = DataLoader(session: session)
+      let loader = DataProvider(session: session)
       loader.runRequest(with: makeAPI(), completion: {_ in})
 
       loader.cancelAll()
@@ -54,7 +54,7 @@ class DataLoaderTests: XCTestCase {
       let session = TestSession()
 
       do {
-         let loader = DataLoader(session: session)
+         let loader = DataProvider(session: session)
          loader.runRequest(with: makeAPI(), completion: {_ in})
       }
 

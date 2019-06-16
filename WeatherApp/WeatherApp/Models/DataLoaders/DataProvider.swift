@@ -1,5 +1,5 @@
 //
-//  DataLoader.swift
+//  DataProvider.swift
 //  WeatherApp
 //
 //  Created by Alex Severyanov on 6/13/19.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-class DataLoader {
+class DataProvider {
    let session: Session
 
    private var tasks: [WeakURLTask] = []
@@ -22,7 +22,7 @@ class DataLoader {
    }
 }
 
-extension DataLoader {
+extension DataProvider {
    @discardableResult
    func runRequest(with api: API, completion: @escaping (Result<Data, Error>) -> Void) -> URLTask? {
       guard let request = api.makeRequest() else { return nil }

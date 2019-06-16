@@ -1,5 +1,5 @@
 //
-//  WeatherImageLoader.swift
+//  WeatherImageProvider.swift
 //  WeatherApp
 //
 //  Created by Alex Severyanov on 6/13/19.
@@ -8,12 +8,12 @@
 
 import UIKit
 
-protocol ImageLoader {
+protocol ImageProvider {
    func load(id: String, completion: @escaping (Result<UIImage, Swift.Error>) -> Void)
    func cancelAll()
 }
 
-final class WeatherImageLoader: DataLoader, ImageLoader {
+final class WeatherImageProvider: DataProvider, ImageProvider {
 
    enum Error: Swift.Error {
       case invalidData

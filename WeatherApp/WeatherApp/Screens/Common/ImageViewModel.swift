@@ -21,13 +21,13 @@ class ImageViewModel: ViewActionPerformer {
    }
 
    let viewQueue: DispatchQueue?
-   let loader: ImageLoader
+   let loader: ImageProvider
    let id: String
 
    var viewActionHandler: (ViewAction) -> Void = {_ in}
    private(set) var state: State = .empty
 
-   init(id: String, viewQueue: DispatchQueue? = .main, loader: ImageLoader = WeatherImageLoader()) {
+   init(id: String, viewQueue: DispatchQueue? = .main, loader: ImageProvider = WeatherImageProvider()) {
       self.id = id
       self.viewQueue = viewQueue
       self.loader = loader

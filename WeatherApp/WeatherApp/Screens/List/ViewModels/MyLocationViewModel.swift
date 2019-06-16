@@ -40,10 +40,10 @@ class MyLocationViewModel: ViewActionPerformer {
    var state: State = .loading
 
    private let locationManager = LocationManager()
-   private let loader: WeatherDataLoader
+   private let loader: WeatherDataProvider
    private let settingsOpener: SettingsOpener
 
-   init(viewQueue: DispatchQueue? = .main, loader: WeatherDataLoader = .init(), settingsOpener: SettingsOpener = UIApplication.shared) {
+   init(viewQueue: DispatchQueue? = .main, loader: WeatherDataProvider = .init(), settingsOpener: SettingsOpener = UIApplication.shared) {
       self.viewQueue = viewQueue
       self.loader = loader
       self.settingsOpener = settingsOpener

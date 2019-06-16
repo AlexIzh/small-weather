@@ -29,11 +29,11 @@ class ListViewModel: ViewActionPerformer, TransitionPerformer {
    var transitionHandler: (Transition) -> Void = {_ in}
    var items: [Item]
 
-   private let loader: WeatherDataLoader
+   private let loader: WeatherDataProvider
    private let loadingViewModel: LoadingViewModel
    private let myLocationViewModel: MyLocationViewModel
 
-   init(viewQueue: DispatchQueue? = .main, loader: WeatherDataLoader = .init()) {
+   init(viewQueue: DispatchQueue? = .main, loader: WeatherDataProvider = .init()) {
       self.viewQueue = viewQueue
       self.loader = loader
 

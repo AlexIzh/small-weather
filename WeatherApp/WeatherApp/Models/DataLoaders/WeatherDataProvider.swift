@@ -1,5 +1,5 @@
 //
-//  WeatherDataLoader.swift
+//  WeatherDataProvider.swift
 //  WeatherApp
 //
 //  Created by Alex Severyanov on 6/13/19.
@@ -9,7 +9,7 @@
 import Foundation
 import CoreLocation
 
-final class WeatherDataLoader: DataLoader {
+final class WeatherDataProvider: DataProvider {
 
    override init(session: Session = URLSession.shared) {
       super.init(session: session)
